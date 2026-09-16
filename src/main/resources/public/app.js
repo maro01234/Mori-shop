@@ -69,7 +69,7 @@ document.addEventListener('click',async e=>{
   try {
     if(button.dataset.favorite){const id=Number(button.dataset.favorite);state=await api('favorites',{product:id,active:!state.favorites.includes(id)});await render();}
     else if(button.dataset.quantity){state=await api('cart',{product:Number(button.dataset.quantity),quantity:Number(button.dataset.value)});await render();}
-    else {const id=Number(button.dataset.add||button.dataset.buy);const quantity=button.closest('.buy-box')?Number($('#detail-quantity')?.value||1):1;const old=state.cart.find(p=>p.id===id)?.quantity||0;state=await api('cart',{product:id,quantity:old+quantity});updateBadge();toast('カートに追加しました');if(button.dataset.buy)location.hash='checkout';}
+    else {const id=Number(button.dataset.add||button.dataset.buy);const quantity=button.closest('.buy-box')?Number($('#detail-quantity')?.value||1):1;const old=state.cart.find(p=>p.id===id)?.quantity||0;state=await api('cart',{product:id,quantity:old+quantity});updateBadge();if(location.hash==='#cart')await render();toast('カートに追加しました');if(button.dataset.buy)location.hash='checkout';}
   }catch(error){toast(error.message);}finally{mutationBusy=false;button.disabled=false;}
 });
 document.addEventListener('change',e=>{if(e.target.id==='sort')sort=e.target.value;else if(e.target.id==='filter-budget')budget=e.target.checked;else if(e.target.id==='filter-stock')available=e.target.checked;else return;render();});
