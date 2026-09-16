@@ -84,6 +84,10 @@ class ShopTest {
             var healthy=client.send(request,HttpResponse.BodyHandlers.ofString());
             assertEquals(200,healthy.statusCode());assertTrue(healthy.body().contains("ok"));
             assertTrue(healthy.headers().firstValue("set-cookie").isEmpty());
+            for(String path:List.of("/","/healthz")) {
+                var head=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+app.port()+path)).method("HEAD",HttpRequest.BodyPublishers.noBody()).build(),HttpResponse.BodyHandlers.ofString());
+                assertEquals(200,head.statusCode());assertEquals("",head.body());
+            }
             try(var c=java.sql.DriverManager.getConnection("jdbc:sqlite:"+database);var s=c.createStatement()) {
                 try(var rows=s.executeQuery("SELECT count(*) FROM sessions")){assertTrue(rows.next());assertEquals(0,rows.getInt(1));}
                 s.execute("ALTER TABLE products RENAME TO unavailable_products");

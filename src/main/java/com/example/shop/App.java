@@ -40,7 +40,7 @@ public final class App {
             x.getResponseHeaders().set("X-Content-Type-Options","nosniff");
             x.getResponseHeaders().set("Referrer-Policy","same-origin");
             x.getResponseHeaders().set("Content-Security-Policy","default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
-            String path=x.getRequestURI().getPath(), method=x.getRequestMethod();
+            String path=x.getRequestURI().getPath(), method=x.getRequestMethod().equals("HEAD")?"GET":x.getRequestMethod();
             if(path.equals("/healthz") && method.equals("GET")) {
                 x.getResponseHeaders().set("Cache-Control","no-store");
                 try {store.health();json(x,200,Map.of("status","ok"));}
@@ -86,7 +86,13 @@ public final class App {
     }
     private static int integer(JsonNode b,String k){if(!b.path(k).isIntegralNumber()||!b.path(k).canConvertToInt())throw new IllegalArgumentException("数量・商品番号が正しくありません。");return b.path(k).intValue();}
     private static void json(HttpExchange x,int status,Object data)throws Exception {send(x,status,"application/json; charset=utf-8",JSON.writeValueAsBytes(data));}
-    private static void send(HttpExchange x,int status,String type,byte[] data)throws Exception{x.getResponseHeaders().set("Content-Type",type);x.sendResponseHeaders(status,data.length);x.getResponseBody().write(data);}
+    private static void send(HttpExchange x,int status,String type,byte[] data)throws Exception{
+        x.getResponseHeaders().set("Content-Type",type);
+        if(x.getRequestMethod().equals("HEAD")){
+            x.getResponseHeaders().set("Content-Length",Integer.toString(data.length));
+            x.sendResponseHeaders(status,-1);
+        }else{x.sendResponseHeaders(status,data.length);x.getResponseBody().write(data);}
+    }
     private static void staticFile(HttpExchange x,String path,String method)throws Exception {
         if(!method.equals("GET")){json(x,405,Map.of("error","Method not allowed"));return;}
         if(path.equals("/"))path="/index.html";
