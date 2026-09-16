@@ -65,3 +65,6 @@ docker run --rm -p 8087:8087 mori-shop
 - `src/main/resources/public/` — HTML・CSS・JavaScript・画像
 - `src/test/java/com/example/shop/ShopTest.java` — 自動テスト
 - `render.yaml` — 無料Webサービス設定
+
+## オンラインデモ
+https://mori-shop.onrender.com/
