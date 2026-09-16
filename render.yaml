@@ -1,0 +1,20 @@
+# Deploy with this directory at the root of its own Git repository.
+services:
+  - type: web
+    name: mori-shop
+    runtime: docker
+    plan: free
+    region: singapore
+    numInstances: 1
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "10000"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=60.0 -XX:+ExitOnOutOfMemoryError"
